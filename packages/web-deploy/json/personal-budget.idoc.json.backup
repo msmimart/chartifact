@@ -4,17 +4,14 @@
     "style": {
         "css": [
             "body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: #f8fafc; }",
-            "body { display: grid; grid-template-areas: 'header header header' 'overview overview insights' 'allocation variance breakdown' 'controls categories presets' 'trends trends trends'; grid-template-columns: 1fr 1fr 1fr; gap: 20px; max-width: 1600px; margin: 0 auto; }",
+            "body { display: grid; grid-template-areas: 'header header' 'overview overview' 'allocation variance' 'controls categories' 'trends trends'; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }",
             ".group { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }",
             "#header { grid-area: header; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; }",
             "#overview { grid-area: overview; text-align: center; }",
-            "#insights { grid-area: insights; min-width: 0; overflow: hidden; }",
             "#allocation { grid-area: allocation; min-width: 0; overflow: hidden; }",
             "#variance { grid-area: variance; min-width: 0; overflow: hidden; }",
-            "#breakdown { grid-area: breakdown; min-width: 0; overflow: hidden; }",
             "#controls { grid-area: controls; min-width: 0; overflow: hidden; }",
             "#categories { grid-area: categories; min-width: 0; overflow: hidden; }",
-            "#presets { grid-area: presets; min-width: 0; overflow: hidden; }",
             "#trends { grid-area: trends; min-width: 0; overflow: hidden; }",
             "h1 { margin: 0; padding: 20px 0; font-size: 2em; font-weight: 600; }",
             "h2 { margin: 10px 0; font-size: 2em; color: #2d3748; font-weight: 600; }",
@@ -23,16 +20,7 @@
             ".tabulator .tabulator-table { min-width: fit-content; }",
             ".slider-container { margin: 15px 0; }",
             ".slider-label { font-weight: 500; color: #2d3748; margin-bottom: 8px; display: block; }",
-            ".metric-box { background: #f7fafc; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #667eea; }",
-            ".metric-value { font-size: 1.5em; font-weight: 600; color: #2d3748; }",
-            ".metric-label { font-size: 0.9em; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; }",
-            ".health-good { border-left-color: #48bb78; background: #f0fff4; }",
-            ".health-warning { border-left-color: #ed8936; background: #fffaf0; }",
-            ".health-danger { border-left-color: #e53e3e; background: #fff5f5; }",
-            ".preset-button { background: #667eea; color: white; border: none; padding: 10px 15px; border-radius: 6px; margin: 5px; cursor: pointer; font-size: 0.9em; }",
-            ".preset-button:hover { background: #5a67d8; }",
-            "@media (max-width: 1200px) { body { grid-template-columns: 1fr 1fr; grid-template-areas: 'header header' 'overview insights' 'allocation variance' 'breakdown breakdown' 'controls categories' 'presets presets' 'trends trends'; } }",
-            "@media (max-width: 768px) { body { grid-template-columns: 1fr; grid-template-areas: 'header' 'overview' 'insights' 'allocation' 'variance' 'breakdown' 'controls' 'categories' 'presets' 'trends'; } }"
+            "@media (max-width: 768px) { body { grid-template-columns: 1fr; grid-template-areas: 'header' 'overview' 'allocation' 'variance' 'controls' 'categories' 'trends'; } }"
         ]
     },
     "dataLoaders": [
@@ -163,48 +151,6 @@
             "variableId": "personalCareActual",
             "type": "number",
             "initialValue": 90
-        },
-        {
-            "variableId": "emergencyFund",
-            "type": "number",
-            "initialValue": 10000
-        },
-        {
-            "variableId": "emergencyFundGoal",
-            "type": "number",
-            "initialValue": 16500,
-            "calculation": {
-                "vegaExpression": "monthlyIncome * 3"
-            }
-        },
-        {
-            "variableId": "emergencyFundProgress",
-            "type": "string",
-            "initialValue": "60%",
-            "calculation": {
-                "vegaExpression": "format((emergencyFund / emergencyFundGoal) * 100, '.0f') + '%'"
-            }
-        },
-        {
-            "variableId": "debtToIncomeRatio",
-            "type": "string",
-            "initialValue": "0%",
-            "calculation": {
-                "vegaExpression": "format((housingBudget / monthlyIncome) * 100, '.1f') + '%'"
-            }
-        },
-        {
-            "variableId": "budgetUtilization",
-            "type": "string",
-            "initialValue": "0%",
-            "calculation": {
-                "vegaExpression": "format((totalBudgeted / monthlyIncome) * 100, '.1f') + '%'"
-            }
-        },
-        {
-            "variableId": "selectedPreset",
-            "type": "string",
-            "initialValue": "current"
         },
         {
             "variableId": "adjustedBudgetData",
@@ -357,28 +303,6 @@
             ]
         },
         {
-            "groupId": "insights",
-            "elements": [
-                "### 💡 Financial Health Insights",
-                "**Emergency Fund Progress**",
-                "Current: ${{emergencyFund}} / Goal: ${{emergencyFundGoal}}",
-                "Progress: {{emergencyFundProgress}}",
-                "",
-                "**Key Ratios**",
-                "Budget Utilization: {{budgetUtilization}}",
-                "Housing-to-Income: {{debtToIncomeRatio}}",
-                "",
-                "**50/30/20 Rule Guide**",
-                "Needs (50%): ${{monthlyIncome * 0.5}}",
-                "Wants (30%): ${{monthlyIncome * 0.3}}",
-                "Savings (20%): ${{monthlyIncome * 0.2}}",
-                "",
-                "**Emergency Fund Target**",
-                "Recommended: 3-6 months expenses",
-                "Your target: ${{emergencyFundGoal}}"
-            ]
-        },
-        {
             "groupId": "allocation",
             "elements": [
                 "### 🥧 Budget Allocation",
@@ -395,69 +319,6 @@
                 {
                     "type": "chart",
                     "chartKey": "budgetVarianceChart"
-                }
-            ]
-        },
-        {
-            "groupId": "breakdown",
-            "elements": [
-                "### 📋 Detailed Budget Breakdown",
-                {
-                    "type": "tabulator",
-                    "data": "adjustedBudgetData",
-                    "columns": [
-                        {
-                            "field": "category",
-                            "title": "Category",
-                            "width": 120,
-                            "headerFilter": "input"
-                        },
-                        {
-                            "field": "adjustedBudget",
-                            "title": "Budgeted",
-                            "formatter": "money",
-                            "formatterParams": {
-                                "symbol": "$",
-                                "precision": 0
-                            },
-                            "width": 100
-                        },
-                        {
-                            "field": "spent",
-                            "title": "Spent",
-                            "formatter": "money",
-                            "formatterParams": {
-                                "symbol": "$",
-                                "precision": 0
-                            },
-                            "width": 100
-                        },
-                        {
-                            "field": "remaining",
-                            "title": "Remaining",
-                            "formatter": "money",
-                            "formatterParams": {
-                                "symbol": "$",
-                                "precision": 0
-                            },
-                            "width": 100,
-                            "cellFormatter": "function(cell, formatterParams, onRendered) { const value = cell.getValue(); const row = cell.getRow(); return '<span style=\"color: ' + (value >= 0 ? '#22c55e' : '#ef4444') + '\">' + (value >= 0 ? '+' : '') + '$' + Math.abs(value).toLocaleString() + '</span>'; }"
-                        },
-                        {
-                            "field": "spentPercentage",
-                            "title": "% Used",
-                            "formatter": "function(cell, formatterParams, onRendered) { const value = cell.getValue(); const percentage = (value * 100).toFixed(1); const color = value > 1 ? '#ef4444' : value > 0.8 ? '#ed8936' : '#22c55e'; return '<span style=\"color: ' + color + '; font-weight: 600;\">' + percentage + '%</span>'; }",
-                            "width": 100
-                        }
-                    ],
-                    "options": {
-                        "height": "280px",
-                        "layout": "fitColumns",
-                        "pagination": false,
-                        "movableColumns": false,
-                        "resizableRows": false,
-                        "selectable": false
-                    }
                 }
             ]
         },
@@ -587,35 +448,6 @@
                     "type": "number",
                     "variableId": "personalCareActual",
                     "label": "Personal Care Actual"
-                }
-            ]
-        },
-        {
-            "groupId": "presets",
-            "elements": [
-                "### 🎯 Budget Scenarios",
-                "**Try different budget strategies:**",
-                "",
-                "**Conservative (High Savings)**",
-                "• Housing: $1800, Food: $500, Savings: $1200",
-                "• Focus on building emergency fund",
-                "",
-                "**Balanced (50/30/20 Rule)**",
-                "• Needs: 50%, Wants: 30%, Savings: 20%",
-                "• Well-rounded financial approach",
-                "",
-                "**Aggressive Savings**",
-                "• Housing: $1600, Food: $450, Savings: $1500",
-                "• Maximize wealth building",
-                "",
-                "**Emergency Fund Builder**",
-                {
-                    "type": "slider",
-                    "variableId": "emergencyFund",
-                    "label": "Current Emergency Fund",
-                    "min": 0,
-                    "max": 50000,
-                    "step": 500
                 }
             ]
         },
