@@ -207,6 +207,46 @@
             "initialValue": "current"
         },
         {
+            "variableId": "financialHealthScore",
+            "type": "number",
+            "initialValue": 0,
+            "calculation": {
+                "vegaExpression": "min(100, max(0, (emergencyFund / emergencyFundGoal * 40) + (savingsBudget / monthlyIncome * 100 * 30) + (totalRemaining > 0 ? 30 : 0)))"
+            }
+        },
+        {
+            "variableId": "financialHealthGrade",
+            "type": "string",
+            "initialValue": "C",
+            "calculation": {
+                "vegaExpression": "financialHealthScore >= 90 ? 'A+' : financialHealthScore >= 80 ? 'A' : financialHealthScore >= 70 ? 'B' : financialHealthScore >= 60 ? 'C' : financialHealthScore >= 50 ? 'D' : 'F'"
+            }
+        },
+        {
+            "variableId": "monthsToEmergencyGoal",
+            "type": "number",
+            "initialValue": 0,
+            "calculation": {
+                "vegaExpression": "savingsBudget > 0 ? ceil((emergencyFundGoal - emergencyFund) / savingsBudget) : 999"
+            }
+        },
+        {
+            "variableId": "recommendedHousingBudget",
+            "type": "number",
+            "initialValue": 0,
+            "calculation": {
+                "vegaExpression": "monthlyIncome * 0.28"
+            }
+        },
+        {
+            "variableId": "housingAffordabilityStatus",
+            "type": "string",
+            "initialValue": "Good",
+            "calculation": {
+                "vegaExpression": "housingBudget <= recommendedHousingBudget ? 'Excellent' : housingBudget <= monthlyIncome * 0.35 ? 'Good' : 'Concerning'"
+            }
+        },
+        {
             "variableId": "adjustedBudgetData",
             "type": "object",
             "isArray": true,
@@ -360,22 +400,35 @@
             "groupId": "insights",
             "elements": [
                 "### 💡 Financial Health Insights",
+                "**Overall Health Score: {{financialHealthScore}}% (Grade: {{financialHealthGrade}})**",
+                "",
+                "### 🎯 Goal Progress",
+                {
+                    "type": "chart",
+                    "chartKey": "financialGoalsChart"
+                },
+                "",
                 "**Emergency Fund Progress**",
                 "Current: ${{emergencyFund}} / Goal: ${{emergencyFundGoal}}",
                 "Progress: {{emergencyFundProgress}}",
+                "Months to Goal: {{monthsToEmergencyGoal}} months",
                 "",
-                "**Key Ratios**",
-                "Budget Utilization: {{budgetUtilization}}",
-                "Housing-to-Income: {{debtToIncomeRatio}}",
+                "**Housing Affordability**",
+                "Your Budget: ${{housingBudget}} ({{debtToIncomeRatio}})",
+                "Recommended Max: ${{recommendedHousingBudget}} (28%)",
+                "Status: {{housingAffordabilityStatus}}",
                 "",
-                "**50/30/20 Rule Guide**",
-                "Needs (50%): ${{monthlyIncome * 0.5}}",
-                "Wants (30%): ${{monthlyIncome * 0.3}}",
-                "Savings (20%): ${{monthlyIncome * 0.2}}",
+                "**Budget Allocation Guidelines**",
+                "• **Needs (50%):** ${{monthlyIncome * 0.5}}",
+                "  Housing, utilities, groceries, minimum debt payments",
+                "• **Wants (30%):** ${{monthlyIncome * 0.3}}",
+                "  Entertainment, dining out, hobbies",
+                "• **Savings (20%):** ${{monthlyIncome * 0.2}}",
+                "  Emergency fund, retirement, investments",
                 "",
-                "**Emergency Fund Target**",
-                "Recommended: 3-6 months expenses",
-                "Your target: ${{emergencyFundGoal}}"
+                "**Current Allocation:**",
+                "Budget Utilization: {{budgetUtilization}} of income",
+                "Savings Rate: {{savingsRate}} (Target: 20%)"
             ]
         },
         {
@@ -593,22 +646,24 @@
         {
             "groupId": "presets",
             "elements": [
-                "### 🎯 Budget Scenarios",
+                "### 🎯 Budget Scenarios & Goals",
                 "**Try different budget strategies:**",
                 "",
-                "**Conservative (High Savings)**",
-                "• Housing: $1800, Food: $500, Savings: $1200",
-                "• Focus on building emergency fund",
+                "**Conservative Strategy**",
+                "• Higher savings rate (25%+)",
+                "• Lower discretionary spending",
+                "• Focus on emergency fund",
                 "",
-                "**Balanced (50/30/20 Rule)**",
-                "• Needs: 50%, Wants: 30%, Savings: 20%",
-                "• Well-rounded financial approach",
+                "**Balanced Approach (50/30/20)**",
+                "• 50% needs, 30% wants, 20% savings",
+                "• Sustainable long-term strategy",
                 "",
                 "**Aggressive Savings**",
-                "• Housing: $1600, Food: $450, Savings: $1500",
-                "• Maximize wealth building",
+                "• Maximize savings rate (30%+)",
+                "• Minimize housing and entertainment",
+                "• Fast-track financial goals",
                 "",
-                "**Emergency Fund Builder**",
+                "**Emergency Fund Progress**",
                 {
                     "type": "slider",
                     "variableId": "emergencyFund",
@@ -616,6 +671,16 @@
                     "min": 0,
                     "max": 50000,
                     "step": 500
+                },
+                "",
+                "**Monthly Savings Goal**",
+                {
+                    "type": "slider",
+                    "variableId": "savingsBudget",
+                    "label": "Monthly Savings Target",
+                    "min": 200,
+                    "max": 2000,
+                    "step": 50
                 }
             ]
         },
@@ -836,6 +901,89 @@
                         }
                     }
                 ]
+            },
+            "financialGoalsChart": {
+                "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+                "width": "container",
+                "height": 200,
+                "data": {
+                    "values": [
+                        {"goal": "Emergency Fund", "current": 10000, "target": 16500, "category": "Safety"},
+                        {"goal": "Monthly Savings", "current": 800, "target": 1100, "category": "Growth"},
+                        {"goal": "Housing Budget", "current": 2000, "target": 1540, "category": "Spending"}
+                    ]
+                },
+                "transform": [
+                    {
+                        "calculate": "datum.current / datum.target",
+                        "as": "progress"
+                    },
+                    {
+                        "calculate": "min(1, datum.progress)",
+                        "as": "progress_capped"
+                    }
+                ],
+                "mark": {
+                    "type": "bar",
+                    "height": 20
+                },
+                "encoding": {
+                    "y": {
+                        "field": "goal",
+                        "type": "nominal",
+                        "axis": {
+                            "title": null,
+                            "labelAngle": 0
+                        }
+                    },
+                    "x": {
+                        "field": "progress_capped",
+                        "type": "quantitative",
+                        "scale": {
+                            "domain": [0, 1]
+                        },
+                        "axis": {
+                            "format": "%",
+                            "title": "Progress to Goal"
+                        }
+                    },
+                    "color": {
+                        "field": "category",
+                        "type": "nominal",
+                        "scale": {
+                            "domain": ["Safety", "Growth", "Spending"],
+                            "range": ["#22c55e", "#667eea", "#ed8936"]
+                        },
+                        "legend": {
+                            "title": "Goal Type"
+                        }
+                    },
+                    "tooltip": [
+                        {
+                            "field": "goal",
+                            "type": "nominal",
+                            "title": "Goal"
+                        },
+                        {
+                            "field": "current",
+                            "type": "quantitative",
+                            "title": "Current",
+                            "format": "$,.0f"
+                        },
+                        {
+                            "field": "target",
+                            "type": "quantitative",
+                            "title": "Target",
+                            "format": "$,.0f"
+                        },
+                        {
+                            "field": "progress",
+                            "type": "quantitative",
+                            "title": "Progress",
+                            "format": ".1%"
+                        }
+                    ]
+                }
             }
         }
     }
